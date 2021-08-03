@@ -44,16 +44,16 @@ SEMEVAL_RELATION_LABELS = ['Other', 'Message-Topic(e1,e2)', 'Message-Topic(e2,e1
                    'Content-Container(e1,e2)', 'Content-Container(e2,e1)']
 
 # Used for TACRED dataset
-TACRED_RELATION_LABELS = ['org:founded_by', 'no_relation', 'per:employee_of', 'org:alternate_names', 
-    'per:cities_of_residence', 'per:children', 'per:title', 'per:siblings', 'per:religion', 
-    'per:age', 'org:website', 'per:stateorprovinces_of_residence', 'org:member_of', 
-    'org:top_members/employees', 'per:countries_of_residence', 'org:city_of_headquarters', 'org:members', 
-    'org:country_of_headquarters', 'per:spouse', 'org:stateorprovince_of_headquarters', 
-    'org:number_of_employees/members', 'org:parents', 'org:subsidiaries', 'per:origin', 
-    'org:political/religious_affiliation', 'per:other_family', 'per:stateorprovince_of_birth', 
-    'org:dissolved', 'per:date_of_death', 'org:shareholders', 'per:alternate_names', 'per:parents', 
-    'per:schools_attended', 'per:cause_of_death', 'per:city_of_death', 'per:stateorprovince_of_death', 
-    'org:founded', 'per:country_of_birth', 'per:date_of_birth', 'per:city_of_birth', 'per:charges', 
+TACRED_RELATION_LABELS = ['org:founded_by', 'no_relation', 'per:employee_of', 'org:alternate_names',
+    'per:cities_of_residence', 'per:children', 'per:title', 'per:siblings', 'per:religion',
+    'per:age', 'org:website', 'per:stateorprovinces_of_residence', 'org:member_of',
+    'org:top_members/employees', 'per:countries_of_residence', 'org:city_of_headquarters', 'org:members',
+    'org:country_of_headquarters', 'per:spouse', 'org:stateorprovince_of_headquarters',
+    'org:number_of_employees/members', 'org:parents', 'org:subsidiaries', 'per:origin',
+    'org:political/religious_affiliation', 'per:other_family', 'per:stateorprovince_of_birth',
+    'org:dissolved', 'per:date_of_death', 'org:shareholders', 'per:alternate_names', 'per:parents',
+    'per:schools_attended', 'per:cause_of_death', 'per:city_of_death', 'per:stateorprovince_of_death',
+    'org:founded', 'per:country_of_birth', 'per:date_of_birth', 'per:city_of_birth', 'per:charges',
     'per:country_of_death']
 
 
@@ -149,7 +149,7 @@ class SemEvalProcessor(DataProcessor):
 
     def _create_examples(self, lines, set_type):
         """Creates examples for the training and dev sets.
-        e.g.,: 
+        e.g.,:
         2	the [E11] author [E12] of a keygen uses a [E21] disassembler [E22] to look at the raw assembly code .	6
         """
         examples = []
@@ -184,7 +184,7 @@ class TacredProcessor(DataProcessor):
 
     def _create_examples(self, lines, set_type):
         """Creates examples for the training and dev sets.
-        e.g.,: 
+        e.g.,:
         2   the [E11] author [E12] of a keygen uses a [E21] disassembler [E22] to look at the raw assembly code .   6
         """
         examples = []
@@ -237,7 +237,7 @@ def convert_examples_to_features(examples, label_list, max_seq_len,
             special_tokens_count = 2
             if len(tokens_a) > max_seq_len - special_tokens_count:
                 tokens_a = _truncate_seq(tokens_a, max_seq_len - special_tokens_count)
-                
+
         # The convention in BERT is:
         # (a) For sequence pairs:
         #  tokens:   [CLS] is this jack ##son ##ville ? [SEP] no it is not . [SEP]
@@ -272,7 +272,7 @@ def convert_examples_to_features(examples, label_list, max_seq_len,
         if use_entity_indicator:
             if "[E22]" not in tokens or "[E12]" not in tokens:  # remove this sentence because after max length truncation, the one entity boundary is broken
                 logger.warning(f"*** Example-{ex_index} is skipped ***")
-                continue 
+                continue
             else:
                 e11_p = tokens.index("[E11]")+1
                 e12_p = tokens.index("[E12]")
@@ -376,7 +376,7 @@ def _truncate_seq(tokens_a, max_length):
         start = min(e11_p, e12_p, e21_p, e22_p)
         end = max(e11_p, e12_p, e21_p, e22_p)
         if end-start > max_length:
-            remaining_length = max_length - (e12_p-e11_p+1) - (e22_p-e21_p+1)  
+            remaining_length = max_length - (e12_p-e11_p+1) - (e22_p-e21_p+1)
             first_addback = math.floor(remaining_length/2)
             second_addback = remaining_length - first_addback
             if start == e11_p:
@@ -388,7 +388,7 @@ def _truncate_seq(tokens_a, max_length):
             new_tokens = tokens_a[start:end+1]
             remaining_length = max_length - len(new_tokens)
             if start < remaining_length:  # add sentence beginning back
-                new_tokens = tokens_a[:start] + new_tokens 
+                new_tokens = tokens_a[:start] + new_tokens
                 remaining_length -= start
             else:
                 new_tokens = tokens_a[start-remaining_length:start] + new_tokens
