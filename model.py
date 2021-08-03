@@ -1,7 +1,13 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from transformers import (WEIGHTS_NAME, BertConfig, BertModel, BertPreTrainedModel, BertTokenizer)
+from transformers import (
+    WEIGHTS_NAME,
+    BertConfig,
+    BertModel,
+    BertPreTrainedModel,
+    BertTokenizer,
+)
 from torch.nn import MSELoss, CrossEntropyLoss
 
 
@@ -45,21 +51,47 @@ class BertForSequenceClassification(BertPreTrainedModel):
         self.bert = BertModel(config)
         self.cls_dropout = nn.Dropout(0.1)  # dropout on CLS transformed token embedding
         self.ent_dropout = nn.Dropout(0.1)  # dropout on average entity embedding
-        self.classifier = nn.Linear(config.hidden_size*3, self.config.num_labels)
+        self.classifier = nn.Linear(config.hidden_size * 3, self.config.num_labels)
         self.init_weights()
 
-    def forward(self, input_ids, token_type_ids=None, attention_mask=None, e1_mask=None, e2_mask=None, labels=None,
-                position_ids=None, head_mask=None):
-        outputs = self.bert(input_ids, position_ids=position_ids, token_type_ids=token_type_ids,
-                            attention_mask=attention_mask, head_mask=head_mask)
+    def forward(
+        self,
+        input_ids,
+        token_type_ids=None,
+        attention_mask=None,
+        e1_mask=None,
+        e2_mask=None,
+        labels=None,
+        position_ids=None,
+        head_mask=None,
+    ):
+        # print("input_ids", input_ids)
+        # print("token_type_ids", token_type_ids)
+        # print("attention_mask", attention_mask)
+        # print("labels", labels)
+        # print("position_ids", position_ids)
+        # print("head_mask", head_mask)
+
+        outputs = self.bert(
+            input_ids,
+            position_ids=position_ids,
+            token_type_ids=token_type_ids,
+            attention_mask=attention_mask,
+            head_mask=head_mask,
+        )
         # for details, see https://huggingface.co/transformers/model_doc/bert.html#bertmodel
-        pooled_output = outputs[1]  # sequence of hidden-states at the output of the last layer of the model
-        sequence_output = outputs[0]  # last layer hidden-state of the first token of the sequence (classification token) further processed by a Linear layer and a Tanh activation function.
+        pooled_output = outputs[
+            1
+        ]  # sequence of hidden-states at the output of the last layer of the model
+        sequence_output = outputs[
+            0
+        ]  # last layer hidden-state of the first token of the sequence (classification token) further processed by a Linear layer and a Tanh activation function.
 
         def extract_entity(sequence_output, e_mask):
             extended_e_mask = e_mask.unsqueeze(1)
             extended_e_mask = torch.bmm(
-                extended_e_mask.float(), sequence_output).squeeze(1)
+                extended_e_mask.float(), sequence_output
+            ).squeeze(1)
             return extended_e_mask.float()
 
         e1_h = self.ent_dropout(extract_entity(sequence_output, e1_mask))
@@ -80,7 +112,7 @@ class BertForSequenceClassification(BertPreTrainedModel):
             else:
                 loss_fct = CrossEntropyLoss()
                 loss = loss_fct(logits.view(-1, self.num_labels), labels.view(-1))
-                
+
             outputs = (loss,) + outputs
 
         return outputs  # (loss), logits, (hidden_states), (attentions)
