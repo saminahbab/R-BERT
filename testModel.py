@@ -14,8 +14,9 @@ CLS_TOKEN = "[CLS]"
 SEP_TOKEN = "[SEP]"
 CLS_TOKEN_SEGMENT_ID = 1
 MAX_LEN = 128
+
 SENTENCE = {
-    "text": "[E11] Apple [E12] shares rose, in what was seen as a tumultuous day for the [E21] FTSE 250 [E22].",
+    "text": "[E11] samin [E12] lives in [E21] germany [E22].",
     "e1": {"start": 0, "end": 5, "span": "Samin"},
     "e2": {"start": 35, "end": 45, "span": "AMICORP"},
 }
