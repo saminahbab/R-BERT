@@ -359,7 +359,9 @@ def load_and_cache_examples(config, task, tokenizer, evaluate=False, test=False)
     if output_mode == "classification":
         all_label_ids = torch.tensor([f.label_id for f in features], dtype=torch.long)
     elif output_mode == "regression":
+
         all_label_ids = torch.tensor([f.label_id for f in features], dtype=torch.float)
+        print(all_label_ids)
     dataset = TensorDataset(
         all_input_ids,
         all_input_mask,
